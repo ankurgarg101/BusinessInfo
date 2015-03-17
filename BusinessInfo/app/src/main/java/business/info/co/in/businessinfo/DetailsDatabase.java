@@ -3,11 +3,14 @@ package business.info.co.in.businessinfo;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.sql.SQLException;
 
 /**
  * Created by marauder on 3/17/15.
  */
-public class DetailsDatabase extends SQLiteOpenHelper {
+public class DetailsDatabase{
 
     public static int version_code = 1;
     public static String db_name = "DetailsDatabase.db";
@@ -53,17 +56,48 @@ public class DetailsDatabase extends SQLiteOpenHelper {
             " (" + payment_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + user_id + " INTEGER, " + payment + " REAL, " +
             payment_date + " TEXT, FOREIGN KEY(" + user_id + ") REFERENCES " + details_table + "(" + user_id + "));";
 
+    private DbHelper ourHelper;
+    private final Context ourContext;
+    private SQLiteDatabase ourDatabase;
+
     public DetailsDatabase(Context context) {
-        super(context, db_name, null, version_code);
+        ourContext = context;
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+    public DetailsDatabase open() throws SQLException{
+        ourHelper = new DbHelper(ourContext);
+        ourDatabase = ourHelper.getWritableDatabase();
+        return  this;
+    }
+    private static class DbHelper extends SQLiteOpenHelper{
 
+       public DbHelper(Context context) {
+           super(context, db_name, null, version_code);
+       }
+
+       @Override
+       public void onCreate(SQLiteDatabase sqLiteDatabase) {
+           sqLiteDatabase.execSQL(create_details_table);
+           sqLiteDatabase.execSQL(creat_payment_table);
+       }
+
+       @Override
+       public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+           Log.w("Database", "Upgrading database from version " + i
+                   + " to " + i2 + ", which will destroy all old data");
+           sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + details_table);
+           sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + payments_table);
+           onCreate(sqLiteDatabase);
+       }
+   }
+
+    public boolean isOpen() {
+        Log.i("isOpenDb", ourDatabase.isOpen() + "");
+        return ourDatabase.isOpen();
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-
+    public void close() {
+        if (ourDatabase.isOpen())
+            ourHelper.close();
     }
 }
