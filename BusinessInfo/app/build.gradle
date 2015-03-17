@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "business.info.co.in.businessinfo"
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 19
         versionCode 1
         versionName "1.0"
     }
@@ -18,7 +18,7 @@ android {
     }
     productFlavors {
     }
-}
+}   
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
