@@ -1,6 +1,7 @@
 package business.info.co.in.businessinfo;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -99,5 +100,32 @@ public class DetailsDatabase{
     public void close() {
         if (ourDatabase.isOpen())
             ourHelper.close();
+    }
+
+    public boolean isEmpty(String table){
+        if(table.equals("details")){
+            Cursor cursor = ourDatabase.rawQuery("SELECT * FROM " + details_table,null);
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.close();
+                Log.i("details empty", "false");
+                return false;
+            } else {
+                Log.i("details empty", "true");
+                cursor.close();
+                return true;
+            }
+        }else{
+            Cursor cursor = ourDatabase.rawQuery("SELECT * FROM " + payments_table,
+                    null);
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.close();
+                Log.i("payments empty", "false");
+                return false;
+            } else {
+                Log.i("payments empty", "true");
+                cursor.close();
+                return true;
+            }
+        }
     }
 }
